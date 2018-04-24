@@ -1,29 +1,29 @@
 - hosts: localhost
   connection: local
   gather_facts: false
-  vars:
-    client_name: "tb"
-    instance_type: "t2.micro"
-    ami_id: "ami-f90a4880"
-    vpc_id: "vpc-880aeaef"
-    region: "eu-west-1"
   environment: 
     "{{proxy_env}}"
   tasks:
+  - name: Include vars of client.
+    include_vars:
+      dir: "{{config_dir}}"
+      extensions: 
+      - yml
+      name: client_params
   - name: Create a new ec2 key pair
     ec2_key:
-      name: "{{client_name}}_keypair"
+      name: "{{client_params.client_name}}_keypair"
       force: false
     register: keypair
   - copy: 
       content: "{{ keypair.key.private_key }}" 
-      dest: "/opt/external/{{client_name}}_key.pem"
+      dest: "/opt/external/{{client_params.client_name}}_key.pem"
     when: keypair.changed
   - name: Security group rule descriptions
     ec2_group:
-      name: "{{ client_name }}_sg"
-      description: "sg for {{client_name}}"
-      vpc_id: "{{ vpc_id }}"
+      name: "{{ client_params.client_name }}_sg"
+      description: "sg for {{client_params.client_name}}"
+      vpc_id: "{{ client_params.vpc_id }}"
       rules:
         - proto: tcp
           ports:
@@ -32,13 +32,13 @@
           rule_desc: allow all on port 22  
   - name: Provision a set of instances
     ec2:
-      key_name: "{{client_name}}_keypair"
-      group: "{{ client_name }}_sg"
-      instance_type: "{{instance_type}}"
-      image: "{{ ami_id }}"
-      region: "{{ region }}"
+      key_name: "{{client_params.client_name}}_keypair"
+      group: "{{ client_params.client_name }}_sg"
+      instance_type: "{{client_params.instance_type}}"
+      image: "{{ client_params.ami_id }}"
+      region: "{{ client_params.region }}"
       wait: true
-      exact_count: 2
+      exact_count: "{{client_params.instances}}"
       count_tag:
         Name: Demo
       instance_tags:
