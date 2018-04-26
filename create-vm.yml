@@ -17,7 +17,7 @@
     register: keypair
   - copy: 
       content: "{{ keypair.key.private_key }}" 
-      dest: "/opt/external/{{client_params.client_name}}_key.pem"
+      dest: "{{params.output_folder}}/{{client_params.client_name}}_key.pem"
     when: keypair.changed
   - name: Security group rule descriptions
     ec2_group:
@@ -54,7 +54,7 @@
   - name: Update inventory file
     template:
       src: templates/ansible-hosts.j2
-      dest: "./hosts"
+      dest: "{{params.output_folder}}/hosts"
 #  - name: Wait for SSH to come up
 #    wait_for:
 #      host: '{{ item.dns_name }}'
