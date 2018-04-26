@@ -1,0 +1,16 @@
+- name: Create EC2 instances
+  ec2:
+    key_name: "{{client_params.client.name}}_{{client_params.client.uid}}"
+    instance_type: "{{client_params.params.instance_type}}"
+    image: "{{ client_params.params.ami_id }}"
+    region: "{{ client_params.params.region }}"
+    wait: true
+    exact_count: "{{client_params.instances}}"
+    count_tag:
+      Name: Demo
+    instance_tags:
+      Name: Demo
+    {% if client_params.params.security_groups is defined %}group: {{group_ec2}}{%endif%}
+    {% if client_params.params.xxx is defined %}test: {{group_ec2}}{%endif%}
+
+  register: ec2

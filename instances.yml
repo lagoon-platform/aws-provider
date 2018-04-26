@@ -1,0 +1,20 @@
+- name: Generate template to create instances
+  template:
+    src: templates/create-ec2.yml
+    dest: "create-ec2-{{client_params.client.uid}}.yml"
+
+- name: Provision instances
+  include_tasks: "create-ec2-{{client_params.client.uid}}.yml"
+  
+- name: Add all instance public IPs to host group
+  add_host: 
+    name: "{{ item.dns_name }}"
+    groups: "ec2hosts"
+    public_ip: "{{ item.public_ip }}"
+  loop: "{{ ec2.tagged_instances }}"
+  
+- name: Update inventory file
+  template:
+    src: templates/ansible-hosts.j2
+    dest: "{{client_params.output_folder}}/hosts"
+  

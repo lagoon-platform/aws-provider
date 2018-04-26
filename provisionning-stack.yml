@@ -1,0 +1,65 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  environment: 
+    "{{proxy_env}}"
+  tasks:
+  - name: Include vars of client.
+    include_vars:
+      dir: "{{config_dir}}"
+      extensions: 
+      - yml
+      name: client_params
+      
+  - name: Create a new ec2 key pair
+    ec2_key:
+      name: "{{client_params.client.name}}_{{client_params.client.uid}}"
+      force: false
+    register: keypair
+  - copy: 
+      content: "{{ keypair.key.private_key }}" 
+      dest: "{{client_params.output_folder}}/{{client_params.client.name}}_key.pem"
+    when: keypair.changed
+    
+  - name: Provision a set of security groups
+    include_tasks: security-group.yml
+    when: client_params.params.security_groups is defined
+      
+  - name: Provision a set of instances
+    include_tasks: instances.yml
+
+#  - name: Provision a set of instances
+#    ec2:
+#      key_name: "{{client_params.client.name}}_keypair"
+#      group: "{{ client_params.params.groups }}"
+#      instance_type: "{{client_params.params.instance_type}}"
+#      image: "{{ client_params.params.ami_id }}"
+#      region: "{{ client_params.params.region }}"
+#      wait: true
+#      exact_count: "{{client_params.instances}}"
+#      count_tag:
+#        Name: Demo
+#      instance_tags:
+#        Name: Demo
+#    register: ec2
+#  - debug: var=ec2
+#  - name: Add all instance public IPs to host group
+#    add_host: 
+#      name: "{{ item.dns_name }}"
+#      groups: "ec2hosts"
+#      public_ip: "{{ item.public_ip }}"
+#    loop: "{{ ec2.tagged_instances }}"
+#  - name: Update inventory file
+#    template:
+#      src: templates/ansible-hosts.j2
+#      dest: "{{client_params.output_folder}}/hosts"
+
+#  - name: Wait for SSH to come up
+#    wait_for:
+#      host: '{{ item.dns_name }}'
+#      port: 22
+#      delay: 60
+#      timeout: 320
+#      state: started
+#    with_items: '{{ ec2.tagged_instances }}'
+
