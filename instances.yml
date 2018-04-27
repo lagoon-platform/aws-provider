@@ -1,6 +1,6 @@
 - name: Generate template to create instances
   template:
-    src: templates/create-ec2.yml
+    src: templates/create-ec2.yml.j2
     dest: "create-ec2-{{client_params.client.uid}}.yml"
 
 - name: Provision instances
@@ -18,3 +18,5 @@
     src: templates/ansible-hosts.j2
     dest: "{{client_params.output_folder}}/hosts"
   
+- name: Write the new ec2 instance host key to known hosts
+  shell: "ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts"

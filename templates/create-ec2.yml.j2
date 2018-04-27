@@ -1,6 +1,6 @@
 - name: Create EC2 instances
   ec2:
-    key_name: "{{client_params.client.name}}_{{client_params.client.uid}}"
+    key_name: "{{lagoon_keypair_name}}"
     instance_type: "{{client_params.params.instance_type}}"
     image: "{{ client_params.params.ami_id }}"
     region: "{{ client_params.params.region }}"
@@ -10,7 +10,7 @@
       Name: Demo
     instance_tags:
       Name: Demo
-    {% if client_params.params.security_groups is defined %}group: {{group_ec2}}{%endif%}
-    {% if client_params.params.xxx is defined %}test: {{group_ec2}}{%endif%}
+    {% if client_params.params.security_groups is defined %}group: {{lagoon_ec2_group}}{% endif %}
+    {% if client_params.params.xxx is defined %}test: {{lagoon_ec2_group}}{% endif %}
 
   register: ec2

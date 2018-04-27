@@ -7,4 +7,4 @@
   loop: "{{client_params.params.security_groups}}"
   
 - set_fact:
-    group_ec2: "{% for g in client_params.params.security_groups %}{{client_params.client.name}}_{{ g.name }}_{{client_params.client.uid}}{% if not loop.last %},{% endif %}{%endfor%}"
+    lagoon_ec2_group: "{% for g in client_params.params.security_groups %}{{client_params.client.name}}_{{ g.name }}_{{client_params.client.uid}}{% if not loop.last %},{% endif %}{%endfor%}"
