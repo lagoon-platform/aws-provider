@@ -1,4 +1,5 @@
 - name: Create Security groups
+  environment: "{{proxy_env}}"
   ec2_group:
     name: "{{client_params.client.name}}_{{ item.name }}_{{client_params.client.uid}}"
     description: "sg {{item.name}} for {{client_params.client.name}}"

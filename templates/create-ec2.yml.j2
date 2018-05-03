@@ -1,4 +1,5 @@
 - name: Create EC2 instances
+  environment: "{{'{{'}}proxy_env{{'}}'}}"
   ec2:
     key_name: "{{lagoon_keypair_name}}"
     instance_type: "{{client_params.params.instance_type}}"
