@@ -1,8 +1,6 @@
 - hosts: localhost
   connection: local
   gather_facts: false
-  environment: 
-    "{{proxy_env}}"
   tasks:
   - name: Include vars of client.
     include_vars:
@@ -31,6 +29,10 @@
   - name: Provision a set of instances
     include_tasks: instances.yml
 
+  - name: Add proxy configuration if needed
+    include_tasks: configure-proxy.yml
+    when: proxy_env is defined
+    
 #  - name: Provision a set of instances
 #    ec2:
 #      key_name: "{{client_params.client.name}}_keypair"
