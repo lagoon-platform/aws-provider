@@ -6,17 +6,3 @@
 - name: Provision instances
   include_tasks: "create-ec2-{{client_params.client.uid}}.yml"
   
-- name: Add all instance public IPs to host group
-  add_host: 
-    name: "{{ item.dns_name }}"
-    groups: "ec2hosts"
-    public_ip: "{{ item.public_ip }}"
-  loop: "{{ ec2.tagged_instances }}"
-  
-- name: Update inventory file
-  template:
-    src: templates/ansible-hosts.j2
-    dest: "{{client_params.output_folder}}/hosts"
-  
-- name: Write the new ec2 instance host key to known hosts
-  shell: "ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts"
