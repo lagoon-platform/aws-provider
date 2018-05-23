@@ -13,13 +13,13 @@ This provider has a dependency with the *core* module to install all *docker com
 > To use EC2 dynamic inventory, set environment variables: ANSIBLE\_INVENTORY and EC2\_INI\_PATH (python module is in *scripts* folder).
 
 
-Example:
+__Example__:
 
 ```
 ansible-playbook provisioning-stack.yml -e "config_dir=/opt/inputs"
 ```
 
-EC2 configuration file example:
+__EC2 configuration file example__:
 
 ```yaml
 params:
