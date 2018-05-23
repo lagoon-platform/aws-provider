@@ -4,7 +4,7 @@ To create a new __AWS EC2 stack__, run the playbook `provisioning-stack.yml`
 		
 This playbook needs one parameter:
 
-- **config_dir**: folder where to find yaml files with EC2 parameters
+- **config_dir**: folder which contains yaml files with EC2 parameters
 
 This provider has a dependency with the *core* module to install all *docker components*.
 
