@@ -6,7 +6,7 @@
   tasks:
   - name: Include vars of client.
     include_vars:
-      dir: "{{config_dir}}"
+      dir: "{{config_dir}}/input/config"
       extensions: 
       - yml
       name: client_params
