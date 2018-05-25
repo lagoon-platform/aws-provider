@@ -40,5 +40,5 @@
     include_tasks: tasks/configure-proxy.yml
     when: proxy_env is defined
 
-- import_playbook: ../core/provisioning-binaries.yml client_name="{{hostvars['localhost'].client_params.client.name}}"
-- import_playbook: ../core/provisioning-swarm.yml client_name="{{hostvars['localhost'].client_params.client.name}}"
+- import_playbook: ../core/ansible/provisioning-binaries.yml client_name="{{hostvars['localhost'].client_params.client.name}}"
+- import_playbook: ../core/ansible/provisioning-swarm.yml client_name="{{hostvars['localhost'].client_params.client.name}}"
