@@ -1,0 +1,7 @@
+- src: https://github.com/tbouvet/ansible-role-configuration.git
+  version: origin/feat-init
+  name: lagoon.configuration
+
+- src: https://github.com/tbouvet/ansible-role-ssh-config.git
+  version: origin/feat-init
+  name: lagoon.ssh

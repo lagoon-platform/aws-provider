@@ -1,0 +1,5 @@
+- name: Create EC2 volumes for {{ item[1].id }} - {{item[0].name}}
+  ec2_vol:
+    instance: "{{ item[1].id }}"
+    region: "{{ lagoon_configuration_params.params.region }}"
+{{item[0].params | to_nice_yaml | indent(4,true)}}
