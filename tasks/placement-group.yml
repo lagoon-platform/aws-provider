@@ -1,3 +1,4 @@
+---
 - name: Generate template to create placement group
   template:
     src: templates/create-placement.yml.j2

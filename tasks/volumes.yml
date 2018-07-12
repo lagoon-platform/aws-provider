@@ -1,3 +1,4 @@
+---
 - name: Generate template to create volumes
   template:
     src: templates/create-volumes.yml.j2
@@ -17,7 +18,7 @@
 
 - block:
   - name: Build Tag
-    set_fact: 
+    set_fact:
       lagoon_volumes: "{{ lagoon_volumes|default({}) | combine( {item.params.device_name: item.name} ) }}"
     with_items: "{{lagoon_configuration_params.volumes}}"
   - name: Get volumes ids
@@ -33,12 +34,12 @@
     ec2_tag:
       region: "{{ lagoon_configuration_params.params.region }}"
       resource: "{{ item.1.id }}"
-      tags: 
+      tags:
         FSName: "{{lagoon_volumes[item.1.attachment_set.device] }}"
     with_subelements:
-      - "{{ ec2_instances_volumes.results }}"
-      - volumes
-    when: 
+    - "{{ ec2_instances_volumes.results }}"
+    - volumes
+    when:
     - lagoon_volumes[item.1.attachment_set.device] is defined
     loop_control:
       label: "{{ item.1.id }} - {{ item.1.attachment_set.device }}"

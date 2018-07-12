@@ -1,3 +1,4 @@
+---
 - hosts: localhost
   connection: local
   gather_facts: false
@@ -20,22 +21,22 @@
         name: "{{lagoon_keypair_name}}"
         force: false
         key_material: "{{ lookup('file', lagoon_configuration_params.connectionConfig.machine_public_key) }}"
-      
+
     - name: Provision a set of security groups
       include_tasks: tasks/security-group.yml
       when: lagoon_configuration_params.params.security_groups is defined
-        
+
     - name: Provision a placement group
       include_tasks: tasks/placement-group.yml
       when: lagoon_configuration_params.params.placement_group is defined
 
     - name: Provision a set of instances
       include_tasks: tasks/instances.yml
-  
+
     - name: Provision volumes
       include_tasks: tasks/volumes.yml
       when: lagoon_configuration_params.volumes is defined
-  
+
     - name: Push outputs to engine
       template:
         src: "templates/output/{{item}}"
@@ -47,4 +48,3 @@
       file:
         path: "{{lagoon_temp_dir}}"
         state: absent
-    

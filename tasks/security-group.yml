@@ -1,3 +1,4 @@
+---
 - name: Create Security groups
   ec2_group:
     name: "{{lagoon_configuration_params.client.name}}_{{ item.name }}_{{lagoon_configuration_params.client.uid}}"
@@ -5,6 +6,9 @@
     vpc_id: "{{ lagoon_configuration_params.params.vpc_id }}"
     rules: "{{item.rules}}"
   loop: "{{lagoon_configuration_params.params.security_groups}}"
-  
+
 - set_fact:
-    lagoon_ec2_group: "{% for g in lagoon_configuration_params.params.security_groups %}{{lagoon_configuration_params.client.name}}_{{ g.name }}_{{lagoon_configuration_params.client.uid}}{% if not loop.last %},{% endif %}{%endfor%}"
+    lagoon_ec2_group: >
+      {% for g in lagoon_configuration_params.params.security_groups %}
+      {{lagoon_configuration_params.client.name}}_{{ g.name }}_{{lagoon_configuration_params.client.uid}}
+      {% if not loop.last %},{% endif %}{%endfor%}
