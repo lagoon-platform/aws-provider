@@ -19,14 +19,16 @@
     loop_control:
       label: "{{ item.block_device_mapping }}"
   - name: Tag volumes
+    vars:
+    - device_name: "{{item.1.attachment_set.device}}"
     ec2_tag:
       region: "{{ lagoon_configuration_params.params.region }}"
       resource: "{{ item.1.id }}"
-      tags: "{{ lagoon_volumes_tags[item.1.attachment_set.device] | combine({'FSName': lagoon_volumes[item.1.attachment_set.device]}) }}"
+      tags: "{{ lagoon_volumes_tags[device_name] | combine({'FSName': lagoon_volumes[device_name]}) }}"
     with_subelements:
     - "{{ ec2_instances_volumes.results }}"
     - volumes
     when:
-    - lagoon_volumes[item.1.attachment_set.device] is defined
+    - lagoon_volumes[device_name] is defined
     loop_control:
       label: "{{ item.1.id }} - {{ item.1.attachment_set.device }}"
