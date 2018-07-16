@@ -14,8 +14,10 @@
 {% endif %}
 {% if lagoon_configuration_params.params.placement_group is defined %}    placement_group: {{lagoon_configuration_params.params.placement_group.name}}
 {% endif %}
-{% if lagoon_configuration_params.params.security_groups is defined %}    group: {{lagoon_ec2_group}}
+{% if lagoon_configuration_params.params.security_groups is defined %}    group: {{lagoon_ec2_group|replace('\n','')}}
 {% endif %}
-{% if lagoon_configuration_params.params.volumes is defined %}    volumes: 
-{{lagoon_configuration_params.params.volumes | to_nice_yaml | indent(4,true)}}{% endif %}
+{% if lagoon_configuration_params.volumes is defined %}    volumes: 
+{% for v in lagoon_configuration_params.volumes %}
+    - {{v.params | to_nice_yaml | indent(6,false)}}{% endfor %}
+{% endif %}
   register: ec2

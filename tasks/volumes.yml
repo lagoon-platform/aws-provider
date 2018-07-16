@@ -1,25 +1,9 @@
 ---
-- name: Generate template to create volumes
-  template:
-    src: templates/create-volumes.yml.j2
-    dest: "{{lagoon_temp_dir}}/create-volumes-{{item[1].id}}-{{index_volume}}.yml"
-  with_nested:
-  - "{{lagoon_configuration_params.volumes}}"
-  - "{{ ec2.tagged_instances }}"
-  register: lagoon_files_result
-  loop_control:
-    index_var: index_volume
-    label: "{{ item[1].id }} - {{ item[0].name }}"
-
-- name: Create volumes
-  include_tasks: "{{item.dest}}"
-  with_items:
-  - "{{lagoon_files_result.results}}"
-
 - block:
   - name: Build Tag
     set_fact:
       lagoon_volumes: "{{ lagoon_volumes|default({}) | combine( {item.params.device_name: item.name} ) }}"
+      lagoon_volumes_tags: "{{ lagoon_volumes_tags|default({}) | combine( {item.params.device_name: item.params.tags|default({})} ) }}"
     with_items: "{{lagoon_configuration_params.volumes}}"
   - name: Get volumes ids
     ec2_vol:
@@ -34,8 +18,7 @@
     ec2_tag:
       region: "{{ lagoon_configuration_params.params.region }}"
       resource: "{{ item.1.id }}"
-      tags:
-        FSName: "{{lagoon_volumes[item.1.attachment_set.device] }}"
+      tags: "{{ lagoon_volumes_tags[item.1.attachment_set.device] | combine({'FSName': lagoon_volumes[item.1.attachment_set.device]}) }}"
     with_subelements:
     - "{{ ec2_instances_volumes.results }}"
     - volumes
