@@ -1,9 +1,13 @@
 ---
 - block:
-  - name: Build Tag
+  - name: Initialize vars 1/2
     set_fact:
-      lagoon_volumes: "{{ lagoon_volumes|default({}) | combine( {item.params.device_name: item.name} ) }}"
-      lagoon_volumes_tags: "{{ lagoon_volumes_tags|default({}) | combine( {item.params.device_name: item.params.tags|default({})} ) }}"
+      lagoon_volumes: {}
+      lagoon_volumes_tags: {}
+  - name: Initialize vars 2/2
+    set_fact:
+      lagoon_volumes: "{{ lagoon_volumes | combine( {item.params.device_name: item.name} ) }}"
+      lagoon_volumes_tags: "{{ lagoon_volumes_tags | combine( {item.params.device_name: item.params.tags|default({})} ) }}"
     with_items: "{{lagoon_configuration_params.volumes}}"
   - name: Get volumes ids
     ec2_vol:
