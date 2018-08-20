@@ -21,9 +21,13 @@
       aws_region: "{{ lookup('env', 'AWS_REGION') | default('eu-west-1', true) }}"
       aws_access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
       aws_secret_access_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+  - name: Check network
+    set_fact:
+      lagoon_public_ip: "{{ lagoon_configuration_params.params.assign_public_ip | default(True) }}"
   - name: Set Provider
     set_fact:
       lagoon_provider: "{{lagoon_configuration_params.connectionConfig.provider}}"
+      lagoon_private: "{% if lagoon_public_ip == False %}-private{% endif %}"
   - name: Return params for AWS
     template:
       src: templates/output/env.yml
