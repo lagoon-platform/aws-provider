@@ -3,6 +3,6 @@
   version: alpha1
   name: lagoon.configuration
 
-- src: https://github.com/lagoon-platform/ansible-role-ssh-config.git
-  version: alpha1
+- src: https://github.com/tbouvet/ansible-role-ssh-config.git
+  version: custom-config
   name: lagoon.ssh
