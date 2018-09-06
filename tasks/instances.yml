@@ -7,18 +7,6 @@
 - name: Provision instances
   include_tasks: "{{lagoon_temp_dir}}/create-ec2-{{lagoon_configuration_params.client.uid}}.yml"
 
-- pause:
-    seconds: 10
-    prompt: "Waiting for machine to be alive..."
-  when: ec2.changed
-
-- name: Refresh Inventory
-  shell: ${ANSIBLE_INVENTORY} --refresh-cache
-  when: ec2.changed
-  changed_when: false
-
-- meta: refresh_inventory
-
 - name: Add tags on instance
   ec2_tag:
     resource: "{{item.id}}"
@@ -30,6 +18,18 @@
     index_var: index_manager
     label: "{{item.id}}"
   when: lagoon_configuration_params.params.instance_tags is defined
+
+- pause:
+    seconds: 10
+    prompt: "Waiting for machine to be alive..."
+  when: ec2.changed
+
+- name: Refresh Inventory
+  shell: ${ANSIBLE_INVENTORY} --refresh-cache
+  when: ec2.changed
+  changed_when: false
+
+- meta: refresh_inventory
 
 - block:
   - name: Estimate Swarm managers count
