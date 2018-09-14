@@ -31,7 +31,6 @@
 
 - meta: refresh_inventory
 
-- debug: var=ec2.tagged_instances
 - block:
   - name: Estimate Swarm managers count
     set_fact:
@@ -45,7 +44,7 @@
       region: "{{item.region}}"
       state: present
       tags:
-        Swarm_type: "{{swarm_type}}"
+        Swarm_type: "{{lagoon_configuration_params.environment.name}}_{{swarm_type}}"
     vars:
       swarm_type: "{% if index_manager < lagoon_managers %}manager{%else%}node{%endif%}"
     loop: "{{ec2.tagged_instances}}"
