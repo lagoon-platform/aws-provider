@@ -10,6 +10,8 @@
       Name: {{ekara_configuration_params.environment.name}}
     instance_tags:
       Name: {{ekara_configuration_params.environment.name}}
+      Stack_id: {{ekara_configuration_params.environment.uid}}
+      Stack_name: {{ekara_configuration_params.environment.name}}
 {% if ekara_configuration_params.params.vpc_subnet_id is defined %}    vpc_subnet_id : {{ekara_configuration_params.params.vpc_subnet_id }}
 {% endif %}
 {% if ekara_configuration_params.params.assign_public_ip is defined %}    assign_public_ip : {{ekara_configuration_params.params.assign_public_ip }}
