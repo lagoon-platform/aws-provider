@@ -1,9 +1,10 @@
+---
 - name: Gather instances
   ec2_instance_facts:
     filters:
       "tag:Stack_name": "{{ ekara_configuration_params.environment.name }}"
       "tag:Stack_qualifier": "{{ ekara_configuration_params.environment.qualifier }}"
-      instance-state-name: ['running','pending','shutting-down','stopped','stopping']
+      instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
   register: ekara_instances_plf
 - set_fact:
     ekara_instances: "{{ekara_instances_plf.instances|length|int}}"
@@ -11,7 +12,7 @@
   ec2_instance_facts:
     filters:
       "tag:Swarm_type": "{{ ekara_plf }}_manager"
-      instance-state-name: ['running','pending','shutting-down','stopped','stopping']
+      instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
   register: ekara_instances_managers
 - set_fact:
     ekara_instances_managers: "{{ekara_instances_managers.instances|length|int}}"
