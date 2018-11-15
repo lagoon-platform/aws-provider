@@ -6,6 +6,11 @@
   - name: Load configuration
     include_role:
       name: ekara.configuration
+  - set_fact:
+      ekara_plf: "{{ekara_configuration_params.environment.name}}_{{ekara_configuration_params.environment.qualifier}}"
+    when:
+    - ekara_plf is not defined
+
   tasks:
   - meta: refresh_inventory
 
@@ -16,12 +21,12 @@
   - name: Gather instances
     ec2_instance_facts:
       filters:
-        "tag:Name": "{{ ekara_configuration_params.environment.name }}"
+        "tag:Name": "{{ ekara_plf }}"
     register: ekara_instances
   - name: Gather Worker hosts
     ec2_instance_facts:
       filters:
-        "tag:Swarm_type": "{{ ekara_configuration_params.environment.name }}_worker"
+        "tag:Swarm_type": "{{ ekara_plf }}_worker"
         instance-state-name: running
     register: ekara_workers
   - name: Update local inventory
