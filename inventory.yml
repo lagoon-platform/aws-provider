@@ -33,6 +33,10 @@
     template:
       src: templates/hosts.j2
       dest: "{{ekara_inventory_path}}/hosts"
+  - name: Update nodeset inventory
+    template:
+      src: templates/hosts-nodeset.j2
+      dest: "{{ekara_inventory_path}}/hosts-{{ekara_configuration_params.environment.nodeset}}"
 
   - name: Check IP configuration
     set_fact:
