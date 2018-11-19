@@ -21,7 +21,8 @@
   - name: Gather instances
     ec2_instance_facts:
       filters:
-        "tag:Name": "{{ ekara_plf }}"
+        "tag:Stack_name": "{{ ekara_configuration_params.environment.name }}"
+        "tag:Stack_qualifier": "{{ ekara_configuration_params.environment.qualifier }}"
     register: ekara_instances
   - name: Gather Worker hosts
     ec2_instance_facts:
