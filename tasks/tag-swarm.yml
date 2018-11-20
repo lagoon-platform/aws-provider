@@ -2,16 +2,17 @@
 - name: Gather instances
   ec2_instance_facts:
     filters:
-      "tag:Stack_name": "{{ ekara_configuration_params.environment.name }}"
-      "tag:Stack_qualifier": "{{ ekara_configuration_params.environment.qualifier }}"
+      "tag:ek.stack_name": "{{ ekara_configuration_params.environment.name }}"
+      "tag:ek.stack_qualifier": "{{ ekara_configuration_params.environment.qualifier }}"
       instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
   register: ekara_instances_plf
+- debug: var=ekara_instances_plf
 - set_fact:
     ekara_instances: "{{ekara_instances_plf.instances|length|int}}"
 - name: Gather instances (managers)
   ec2_instance_facts:
     filters:
-      "tag:Swarm_type": "{{ ekara_plf }}_manager"
+      "tag:ek.swarm_type": "{{ ekara_plf }}_manager"
       instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
   register: ekara_instances_managers
 - set_fact:
@@ -34,12 +35,12 @@
     region: "{{item.region}}"
     state: present
     tags:
-      Swarm_type: "{{ekara_plf}}_{{swarm_type}}"
+      ek.swarm_type: "{{ekara_plf}}_{{swarm_type}}"
   vars:
     swarm_type: "{% if index_manager < ekara_manager_tocreate|int %}manager{%else%}worker{%endif%}"
   loop: "{{ec2.tagged_instances}}"
   loop_control:
     index_var: index_manager
-    label: "{{item.id}} - {{item.tags.Swarm_type|default(swarm_type)}}"
+    label: "{{item.id}} - {{item.tags['ek.swarm_type']|default(swarm_type)}}"
   when:
-  - item.tags.Swarm_type is not defined
+  - item.tags['ek.swarm_type'] is not defined

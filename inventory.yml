@@ -21,13 +21,13 @@
   - name: Gather instances
     ec2_instance_facts:
       filters:
-        "tag:Stack_name": "{{ ekara_configuration_params.environment.name }}"
-        "tag:Stack_qualifier": "{{ ekara_configuration_params.environment.qualifier }}"
+        "tag:ek.stack_name": "{{ ekara_configuration_params.environment.name }}"
+        "tag:ek.stack_qualifier": "{{ ekara_configuration_params.environment.qualifier }}"
     register: ekara_instances
   - name: Gather Worker hosts
     ec2_instance_facts:
       filters:
-        "tag:Swarm_type": "{{ ekara_plf }}_worker"
+        "tag:ek.swarm_type": "{{ ekara_plf }}_worker"
         instance-state-name: running
     register: ekara_workers
   - name: Update local inventory
