@@ -46,11 +46,11 @@
         dest: "{{output_dir}}/{{item}}"
       with_items:
       - params.yaml
-#    always:
-#    - name: Purge temp dir
-#      file:
-#        path: "{{ekara_temp_dir}}"
-#        state: absent
+    always:
+    - name: Purge temp dir
+      file:
+        path: "{{ekara_temp_dir}}"
+        state: absent
 
 - name: Create Inventory
   import_playbook: inventory.yml
