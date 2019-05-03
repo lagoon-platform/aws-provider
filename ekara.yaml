@@ -1,7 +1,9 @@
 providers:
-  aws:
+  ek-aws:
+    params:
+      region: {{ .ek.aws.region }}
     env:
-      AWS_REGION: {{ .aws.region }}
-      AWS_ACCESS_KEY_ID: {{ .aws.accessKey.id }}
-      AWS_SECRET_ACCESS_KEY: {{ .aws.accessKey.secret }}
+      AWS_REGION: {{ .ek.aws.region }}
+      AWS_ACCESS_KEY_ID: {{ .ek.aws.accessKey.id }}
+      AWS_SECRET_ACCESS_KEY: {{ .ek.aws.accessKey.secret }}
 
