@@ -56,4 +56,3 @@
     - "{{ ekara_instances.instances }}"
     loop_control:
       label: "{{ item.instance_id }}"
-
