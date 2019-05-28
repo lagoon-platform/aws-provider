@@ -1,0 +1,32 @@
+- name: Create EC2 instance(s)
+  ec2:
+    key_name: "{{ekara_env_id}}"
+    instance_type: "{{ek_config.params.instance_type}}"
+    image: "{{ ek_config.params.ami_id }}"
+    region: "{{ekara_aws_region}}"
+    wait: true
+    exact_count: "{{ek_config.instances}}"
+    count_tag:
+      ek_nodeset_id: "{{ekara_nodeset_id}}"
+    instance_tags:
+      Name: "{{ek_config.environment.name}} - {{ek_config.environment.qualifier}} ({{ek_config.environment.nodeset}})"
+      ek_env_id: "{{ekara_env_id}}"
+      ek_nodeset_id: "{{ekara_nodeset_id}}"
+      ek_nodeset_name: "{{ek_config.environment.nodeset}}"
+{% if ek_config.labels|length > 0 %}{{ek_config.labels | to_nice_yaml | indent(6,true)}}
+{% endif %}
+{% if ek_config.params.vpc_subnet_id is defined %}    vpc_subnet_id : {{ek_config.params.vpc_subnet_id }}
+{% endif %}
+{% if ek_config.params.assign_public_ip is defined %}    assign_public_ip : {{ek_config.params.assign_public_ip }}
+{% endif %}
+{% if ek_config.params.placement_group is defined %}    placement_group: {{ek_config.params.placement_group.name}}
+{% endif %}
+{% if ek_config.params.security_groups is defined %}    group: {{ek_ec2_group|replace('\n','')}}
+{% endif %}
+{% if ek_config.params.security_groups_ids is defined %}    group_id: {{ek_config.params.security_groups_ids}}
+{% endif %}
+{% if ek_config.volumes is defined %}    volumes: 
+{% for v in ek_config.volumes %}
+    - {{v.params | to_nice_yaml | indent(6,false)}}{% endfor %}
+{% endif %}
+  register: ec2

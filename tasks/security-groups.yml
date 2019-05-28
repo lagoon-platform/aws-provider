@@ -1,0 +1,14 @@
+---
+- name: Create security group(s)
+  ec2_group:
+    name: "{{ek_config.environment.id}}_{{ item.name }}"
+    description: "sg {{item.name}} for {{ek_config.environment.id}}"
+    vpc_id: "{{ ek_config.params.vpc_id }}"
+    rules: "{{item.rules}}"
+  loop: "{{ek_config.params.security_groups}}"
+
+- set_fact:
+    ek_ec2_group: |
+      {% for g in ek_config.params.security_groups %}
+      {{ek_config.environment.id}}_{{ g.name }}
+      {% if not loop.last %},{% endif %}{%endfor%}

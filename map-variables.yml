@@ -1,3 +1,0 @@
----
-private_ip: "{{private_ip_address}}"
-public_ip: "{{public_ip_address | default('')}}"

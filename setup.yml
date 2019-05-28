@@ -6,7 +6,6 @@
   - name: Checkout roles
     command: ansible-galaxy install -r requirements.yml
 
-
 - hosts: localhost
   connection: local
   gather_facts: false
@@ -14,59 +13,40 @@
   - name: Load configuration
     include_role:
       name: ekara.configuration
+
   tasks:
-  - include_role:
-      name: aws-cli
-    vars:
-      aws_region: "{{ lookup('env', 'AWS_REGION') | default('eu-west-1', true) }}"
-      aws_access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-      aws_secret_access_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
-  - name: Check parameters
-    block:
-    - set_fact:
-        required_vars:
-        - input_dir
-        - output_dir
-        - ekara_configuration_params
-    - name: Check required parameters
-      fail: msg="Parameter '{{item}}' is not defined"
-      when: item not in vars
-      with_items: "{{required_vars}}"
-    - name: Check required parameters in Params
-      fail: msg="Parameter '{{item}}' is not defined in [ConnectionConfig] tag."
-      when: item not in ekara_configuration_params.connectionConfig
-      with_items:
-      - provider
-      - machine_private_key
-      - machine_public_key
-  - name: Check network
-    set_fact:
-      ekara_public_ip: "{{ ekara_configuration_params.params.assign_public_ip | default(True) }}"
-  - name: Set Provider
-    set_fact:
-      ekara_provider: "{{ekara_configuration_params.connectionConfig.provider}}"
-      ekara_network: "{% if ekara_public_ip == False %}-private{% else %}-public{% endif %}"
-  - name: Return params for AWS
+  - name: Create the AWS config directory
+    file:
+      path: /root/.aws
+      state: directory
+
+  - name: Copy AWS CLI config
     template:
-      src: "templates/output/{{item}}"
-      dest: "{{output_dir}}/{{item}}"
-    with_items:
-    - env.yaml
-    - inventory.yaml
-  - name: Add ssh configuration
+      src: templates/aws/config
+      dest: /root/.aws/config
+      mode: 0600
+
+  # TODO: remove AWS credentials files in favor of propagated environment variables
+  # (must also be available in later phases for inventory)
+  - name: Copy AWS CLI credentials
+    template:
+      src: templates/aws/credentials
+      dest: /root/.aws/credentials
+      mode: 0600
+
+  - name: Add initial SSH configuration
     include_role:
       name: ekara.ssh
     vars:
       ekara_ssh_proxy: "{{ lookup('env', 'http_proxy') }}"
-      ekara_ssh_key: "{{ ekara_configuration_params.connectionConfig.machine_private_key }}"
+      ekara_ssh_key: "{{ ek_config.connectionConfig.machine_private_key }}"
       ekara_ssh_host: '*.amazonaws.com'
-    when: lookup('env', 'http_proxy') != ""
 
-  - name: Add AWS modules
+  - name: Install AWS modules with PIP
     become: true
     pip:
       name:
-      - awscli==1.16.74
-      - boto3==1.9.64
+      - awscli==1.16.193
+      - boto3==1.9.183
       - boto==2.49.0
       state: present

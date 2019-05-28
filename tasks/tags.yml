@@ -1,0 +1,80 @@
+---
+- name: Add labels on EC2 instance(s)
+  ec2_tag:
+    resource: "{{item.id}}"
+    region: "{{item.region}}"
+    state: present
+    tags: "{{ek_config.params.instance_tags}}"
+  loop: "{{ec2.tagged_instances}}"
+  loop_control:
+    label: "{{item.id}}"
+  when: ek_config.params.instance_tags is defined
+
+- name: Gather new EC2 instance(s) without role
+  set_fact:
+    ekara_new_instances: "{{ (ekara_new_instances|default([])) + [item] }}"
+  loop: "{{ ec2.tagged_instances }}"
+  loop_control:
+    index_var: index
+    label: "{{item.id}}"
+  when:
+  - ec2.tagged_instances[index].tags['ek_role'] is not defined
+
+- name: Automatically assign roles to new EC2 instance(s)
+  when:
+  - ekara_new_instances is defined
+  block:
+  - debug:
+      msg: "{{ekara_new_instances|length|int}} new instance(s) found"
+
+  - name: Gather all EC2 instance(s)
+    ec2_instance_facts:
+      filters:
+        "tag:ek_env_id": "{{ ekara_env_id }}"
+        instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
+    register: ekara_instances
+
+  - set_fact:
+      ekara_instances_count: "{{ekara_instances.instances|length|int}}"
+
+  - debug:
+      msg: "{{ekara_instances_count|int}} total instance(s) found"
+
+  - name: Gather environment existing managers
+    ec2_instance_facts:
+      filters:
+        "tag:ek_role": "manager"
+        instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
+    register: ekara_manager_instances
+
+  - set_fact:
+      ekara_existing_manager_count: "{{ekara_manager_instances.instances|length|int}}"
+
+  - debug:
+      msg: "{{ekara_existing_manager_count|int}} existing manager(s) found"
+
+  - name: Estimate total manager count
+    set_fact:
+      ekara_total_manager_count: >
+        {% set ns = namespace(managers=1) %}{% for x in range(1,([5,(ekara_instances_count|int)]|min)+1) %}
+        {%if x % 2 == 1%}{% set ns.managers = x %}{%endif%}{%endfor%}{{ns.managers}}
+
+  - set_fact:
+      ekara_missing_manager_count: "{{ (ekara_total_manager_count|int) - (ekara_existing_manager_count|int) }}"
+
+  - debug:
+      msg: "{{ ekara_missing_manager_count|int }} EC2 instance(s) must be assigned the manager role"
+
+  - name: Assigning role to EC2 instances(s)
+    ec2_tag:
+      resource: "{{item.id}}"
+      region: "{{item.region}}"
+      state: present
+      tags:
+        ek_role: "{{ek_role}}"
+    vars:
+      ek_role: "{% if index_manager < (ekara_missing_manager_count|int) %}manager{%else%}worker{%endif%}"
+    loop: "{{ekara_new_instances}}"
+    loop_control:
+      index_var: index_manager
+      label: "{{item.id}} - {{item.tags['ek_role']|default(ek_role)}}"
