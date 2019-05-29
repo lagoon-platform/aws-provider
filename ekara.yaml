@@ -1,7 +1,7 @@
 providers:
   ek-aws:
     params:
-      region: {{ .ek.aws.region }}
+      region: {{ .Vars.ek.aws.region }}
     env:
       AWS_REGION: {{ .Vars.ek.aws.region }}
       AWS_ACCESS_KEY_ID: {{ .Vars.ek.aws.accessKey.id }}
