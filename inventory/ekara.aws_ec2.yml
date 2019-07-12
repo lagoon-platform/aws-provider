@@ -1,0 +1,36 @@
+---
+plugin: aws_ec2
+
+regions:
+- {{ .Vars.ek.aws.region }}
+
+hostnames:
+- dns-name
+- ip-address
+- private-dns-name
+- private-ip-address
+
+filters:
+  instance-state-code: '16'
+  tag:ek_env_id: {{ .Model.QualifiedName }}
+
+keyed_groups:
+- key: tags.ek_nodeset_name
+  separator: _
+  prefix: ek_nodeset
+- key: tags.ek_role
+  separator: _
+  prefix: ek_role
+- key: tags | dict2items | json_query('[?starts_with(key, `ek_label_`)]') | items2dict | replace('ek_label_', '')
+  separator: _
+  prefix: ek_label
+
+compose:
+  ekara: >
+    {
+      'public_ip': public_ip_address,
+      'private_ip': private_ip_address,
+      'role': tags.ek_role,
+      'nodeset': tags.ek_nodeset_name,
+      'environment': tags.ek_env_id
+    }

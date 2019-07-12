@@ -2,43 +2,62 @@
 - hosts: localhost
   connection: local
   gather_facts: false
+
   pre_tasks:
   - name: Load configuration
     include_role:
       name: ekara.configuration
+
   tasks:
   - set_fact:
-      ekara_keypair_name: "{{ekara_configuration_params.environment.name}}_{{ekara_configuration_params.environment.qualifier}}"
+      ekara_env_id: "{{ek_config.environment.name}}_{{ek_config.environment.qualifier}}"
+      ekara_nodeset_id: "{{ek_config.environment.name}}_{{ek_config.environment.qualifier}}_{{ek_config.environment.nodeset}}"
       ekara_temp_dir: "tmp-{{lookup('pipe','date') | to_uuid}}"
       ekara_aws_region: "{{ lookup('env', 'AWS_REGION') }}"
-      ekara_plf: "{{ekara_configuration_params.environment.name}}_{{ekara_configuration_params.environment.qualifier}}"
 
-  - name: Create temp dir
-    file:
-      path: "{{ekara_temp_dir}}"
-      state: directory
-  - name: Create Infrastructure
+  - debug:
+      msg: "ekara_env_id={{ekara_env_id}}"
+  - debug:
+      msg: "ekara_nodeset_id={{ekara_nodeset_id}}"
+  - debug:
+      msg: "ekara_temp_dir={{ekara_temp_dir}}"
+  - debug:
+      msg: "ekara_aws_region={{ekara_aws_region}}"
+  - debug:
+      msg: "ekara_aws_key={{lookup('env', 'AWS_ACCESS_KEY_ID')}}"
+  - debug:
+      msg: "ekara_aws_secret={{lookup('env', 'AWS_SECRET_ACCESS_KEY')}}"
+
+  - name: Create AWS infrastructure
     block:
-    - name: Create a new ec2 key pair
+    - name: Create temporary directory
+      file:
+        path: "{{ekara_temp_dir}}"
+        state: directory
+
+    - name: Create a new EC2 key pair
       ec2_key:
-        name: "{{ekara_keypair_name}}"
+        name: "{{ekara_env_id}}"
         force: false
-        key_material: "{{ lookup('file', ekara_configuration_params.connectionConfig.machine_public_key) }}"
+        key_material: "{{ lookup('file', ek_config.connectionConfig.machine_public_key) }}"
 
-    - name: Provision a set of security groups
-      include_tasks: tasks/security-group.yml
-      when: ekara_configuration_params.params.security_groups is defined
+    - name: Provision security group(s)
+      include_tasks: tasks/security-groups.yml
+      when: ek_config.params.security_groups is defined
 
-    - name: Provision a placement group
-      include_tasks: tasks/placement-group.yml
-      when: ekara_configuration_params.params.placement_group is defined
+    - name: Provision placement group
+      include_tasks: tasks/placement-groups.yml
+      when: ek_config.params.placement_group is defined
 
-    - name: Provision a set of instances
+    - name: Provision EC2 instance(s)
       include_tasks: tasks/instances.yml
+
+    - name: Tag EC2 instance(s)
+      include_tasks: tasks/tags.yml
 
     - name: Provision volumes
       include_tasks: tasks/volumes.yml
-      when: ekara_configuration_params.volumes is defined
+      when: ek_config.volumes is defined
 
     - name: Push outputs to engine
       template:
@@ -46,11 +65,24 @@
         dest: "{{output_dir}}/{{item}}"
       with_items:
       - params.yaml
+
     always:
-    - name: Purge temp dir
+    - name: Purge temporary directory
       file:
         path: "{{ekara_temp_dir}}"
         state: absent
 
-- name: Create Inventory
-  import_playbook: inventory.yml
+  - name: Add SSH configuration to EC2 instance(s) without public IP
+    include_role:
+      name: ekara.ssh
+    vars:
+      ekara_ssh_proxy:
+      ekara_ssh_key: "{{ ek_config.connectionConfig.machine_private_key }}"
+      ekara_ssh_host: "{{item.private_ip_address}}"
+    when:
+    - ek_config.params.assign_public_ip | default(True) == False
+    - item.state.code != 48
+    with_items:
+    - "{{ ekara_instances.instances }}"
+    loop_control:
+      label: "{{ item.instance_id }}"

@@ -2,28 +2,29 @@
 - block:
   - set_fact:
       ekara_volumes_tmp: []
+
   - set_fact:
       ekara_volumes_tmp: "{{ ekara_volumes_tmp + [item | combine({'device_name': item.params.device_name})] }}"
-    with_items: "{{ekara_configuration_params.volumes}}"
+    with_items: "{{ek_config.volumes}}"
     when: item.device_name is not defined
+
   - set_fact:
       ekara_volumes_tmp: "{{ ekara_volumes_tmp + [item] }}"
-    with_items: "{{ekara_configuration_params.volumes}}"
+    with_items: "{{ek_config.volumes}}"
     when: item.device_name is defined
-  - name: Fix default device name
-    set_fact:
-      ekara_configuration_params: "{{ekara_configuration_params | combine({'volumes': ekara_volumes_tmp})}}"
 
-  - name: Initialize vars 1/2
-    set_fact:
+  - set_fact:
+      ek_config: "{{ek_config | combine({'volumes': ekara_volumes_tmp})}}"
+
+  - set_fact:
       ekara_volumes_tags: {}
       ekara_volumes_devices: {}
-  - name: Initialize vars 2/2
-    set_fact:
+
+  - set_fact:
       ekara_volumes: "{{ (ekara_volumes|default({})) | combine({item.params.device_name: item.path}) }}"
       ekara_volumes_tags: "{{ ekara_volumes_tags | combine( {item.params.device_name: item.params.tags|default({})} ) }}"
       ekara_volumes_devices: "{{ ekara_volumes_devices | combine( {item.params.device_name: item.device_name} ) }}"
-    with_items: "{{ekara_configuration_params.volumes}}"
+    with_items: "{{ek_config.volumes}}"
 
   - name: Get volumes ids
     ec2_vol:
@@ -34,17 +35,18 @@
     register: ec2_instances_volumes
     loop_control:
       label: "{{ item.block_device_mapping }}"
+
   - name: Tag volumes
-    vars:
-    - device_name: "{{item.1.attachment_set.device}}"
     ec2_tag:
       region: "{{ ekara_aws_region }}"
       resource: "{{ item.1.id }}"
       tags: "{{ ekara_volumes_tags[device_name] | combine({'FSName': ekara_volumes[device_name]}) }}"
+    vars:
+    - device_name: "{{item.1.attachment_set.device}}"
     with_subelements:
     - "{{ ec2_instances_volumes.results }}"
     - volumes
-    when:
-    - ekara_volumes_tags[device_name] is defined
     loop_control:
       label: "{{ item.1.id }} - {{ item.1.attachment_set.device }}"
+    when:
+    - ekara_volumes_tags[device_name] is defined
