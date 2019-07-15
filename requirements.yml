@@ -6,3 +6,7 @@
 - src: https://github.com/ekara-platform/ansible-role-ssh-config.git
   version: master
   name: ekara.ssh
+
+- src: https://github.com/ekara-platform/ansible-role-filesystem.git
+  version: master
+  name: ekara.filesystem

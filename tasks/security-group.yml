@@ -1,0 +1,28 @@
+---
+- name: Define defaults and mandatory settings for the EC2 security group
+  set_fact:
+    ek_ec2_current_sg_defaults: >
+      {{ 
+        {
+          'name': "{{ ekara_nodeset_id }}_{{ sg_item.key }}",
+          'description': "Security group {{ sg_item.key }} for {{ ekara_nodeset_id }}"
+        }
+      }}
+    ek_ec2_current_sg_mandatory: >
+      {{ 
+        {
+          'region': "{{ ekara_aws_region }}",
+          'state': 'present'
+        }
+      }}
+- name: Combine security group user settings with default and mandatory settings
+  set_fact:
+    ek_ec2_current_sg_settings: "{{ ek_ec2_current_sg_defaults | combine(sg_item.value | default({}), recursive=True) | combine(ek_ec2_current_sg_mandatory, recursive=True) }}"
+- debug:
+    var: ek_ec2_current_sg_settings
+- name: Ensure the security group is present
+  ec2_group: "{{ ek_ec2_current_sg_settings }}"
+  register: ek_ec2_current_sg_info
+- name: Store information about the security group
+  set_fact:
+    ek_ec2_sg_info: "{{ ek_ec2_sg_info | default({}) | combine({sg_item.key: ek_ec2_current_sg_info}, recursive=True) }}"

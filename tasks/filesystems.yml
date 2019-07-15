@@ -1,0 +1,7 @@
+---
+- name: "Iterating over volume(s) to create and mount filesystem(s)"
+  loop: "{{ hostvars['localhost'].ek_ec2_vol_info[ekara.id] | dict2items }}"
+  when: hostvars['localhost'].ek_ec2_vol_info[ekara.id] is defined and hostvars['localhost'].ek_ec2_vol_info[ekara.id] | length > 0
+  loop_control:
+    loop_var: fs_item
+  include: filesystem.yml

@@ -12,77 +12,46 @@
   - set_fact:
       ekara_env_id: "{{ek_config.environment.name}}_{{ek_config.environment.qualifier}}"
       ekara_nodeset_id: "{{ek_config.environment.name}}_{{ek_config.environment.qualifier}}_{{ek_config.environment.nodeset}}"
-      ekara_temp_dir: "tmp-{{lookup('pipe','date') | to_uuid}}"
       ekara_aws_region: "{{ lookup('env', 'AWS_REGION') }}"
 
   - debug:
       msg: "ekara_env_id={{ekara_env_id}}"
   - debug:
       msg: "ekara_nodeset_id={{ekara_nodeset_id}}"
-  - debug:
-      msg: "ekara_temp_dir={{ekara_temp_dir}}"
-  - debug:
-      msg: "ekara_aws_region={{ekara_aws_region}}"
-  - debug:
-      msg: "ekara_aws_key={{lookup('env', 'AWS_ACCESS_KEY_ID')}}"
-  - debug:
-      msg: "ekara_aws_secret={{lookup('env', 'AWS_SECRET_ACCESS_KEY')}}"
 
-  - name: Create AWS infrastructure
+  - name: Provision AWS EC2 infrastructure
     block:
-    - name: Create temporary directory
-      file:
-        path: "{{ekara_temp_dir}}"
-        state: directory
-
-    - name: Create a new EC2 key pair
+    - name: Create a new key pair
       ec2_key:
-        name: "{{ekara_env_id}}"
-        force: false
+        name: "ek_{{ekara_env_id}}"
         key_material: "{{ lookup('file', ek_config.connectionConfig.machine_public_key) }}"
+
+    - name: Provision placement group
+      include_tasks: tasks/placement-group.yml
+      when: ek_config.params.placementGroup is defined
 
     - name: Provision security group(s)
       include_tasks: tasks/security-groups.yml
-      when: ek_config.params.security_groups is defined
+      when: (ek_config.params.securityGroups is defined) and (ek_config.params.securityGroups | length > 0)
 
-    - name: Provision placement group
-      include_tasks: tasks/placement-groups.yml
-      when: ek_config.params.placement_group is defined
-
-    - name: Provision EC2 instance(s)
+    - name: Provision instance(s)
       include_tasks: tasks/instances.yml
 
-    - name: Tag EC2 instance(s)
-      include_tasks: tasks/tags.yml
-
-    - name: Provision volumes
+    - name: Provision volume(s)
       include_tasks: tasks/volumes.yml
-      when: ek_config.volumes is defined
+      when: ek_config.params.volumes is defined
 
-    - name: Push outputs to engine
-      template:
-        src: "templates/output/{{item}}"
-        dest: "{{output_dir}}/{{item}}"
-      with_items:
-      - params.yaml
+    - name: Determine role of instance(s)
+      include_tasks: tasks/role-tags.yml
+      when: ek_config.role is not defined
 
-    always:
-    - name: Purge temporary directory
-      file:
-        path: "{{ekara_temp_dir}}"
-        state: absent
+  - name: Refresh inventory to gather new EC2 instance(s) if any
+    meta: refresh_inventory
 
-  - name: Add SSH configuration to EC2 instance(s) without public IP
-    include_role:
-      name: ekara.ssh
-    vars:
-      ekara_ssh_proxy:
-      ekara_ssh_key: "{{ ek_config.connectionConfig.machine_private_key }}"
-      ekara_ssh_host: "{{item.private_ip_address}}"
-    when:
-    - ek_config.params.assign_public_ip | default(True) == False
-    - item.state.code != 48
-    with_items:
-    - "{{ ekara_instances.instances }}"
-    loop_control:
-      label: "{{ item.instance_id }}"
+- hosts: ek_nodeset_{{ hostvars['localhost'].ek_config.environment.nodeset }}
+  gather_facts: false
+
+  tasks:
+  - name: Make filesystem(s) and mount volume(s)
+    include_tasks: tasks/filesystems.yml
+    when: hostvars['localhost'].ek_ec2_vol_info is defined

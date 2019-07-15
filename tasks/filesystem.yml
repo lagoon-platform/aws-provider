@@ -1,0 +1,35 @@
+---
+- name: Define default and mandatory settings for filesystem
+  set_fact:
+    ek_fs_defaults: >
+      {{ 
+        {
+          'type': 'ext4',
+          'mount_opts': 'defaults'
+        }
+      }}
+    ek_fs_mandatory: >
+      {{ 
+        {
+        }
+      }}
+      
+- name: Combine filesystem user settings with default and mandatory settings
+  set_fact:
+    ek_fs_settings: "{{ ek_fs_defaults | combine(hostvars['localhost'].ek_config.params.volumes[fs_item.key].fs | default({}), recursive=True) | combine(ek_fs_mandatory, recursive=True) }}"
+
+- name: Inject volume device into filesystem settings
+  set_fact:
+    ek_fs_settings: "{{ ek_fs_settings | combine({'device': fs_item.value.device}, recursive=True) }}"
+
+- debug:
+    var: ek_fs_settings
+
+- name: Format and mount volume
+  include_role:
+    name: ekara.filesystem
+  vars:
+    ek_fs_device: "{{ ek_fs_settings.device }}"
+    ek_fs_type: "{{ ek_fs_settings.type }}"
+    ek_fs_mount_path: "{{ ek_fs_settings.mount_path }}"
+    ek_fs_mount_opts: "{{ ek_fs_settings.mount_opts }}"

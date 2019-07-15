@@ -1,8 +1,57 @@
 ---
-- name: Generate template to create EC2 instance(s)
-  template:
-    src: templates/instances.yml.j2
-    dest: "{{ekara_temp_dir}}/instances-{{ek_config.environment.id}}.yml"
+- name: Define defaults and mandatory settings for EC2 instance creation
+  set_fact:
+    ek_ec2_instance_defaults: >
+      {
+        'image': "ami-f90a4880",
+        'instance_tags': {
+            'Name': "{{ek_config.environment.name}} ({{ek_config.environment.qualifier}}) - {{ek_config.environment.nodeset}}"
+        }
+      }
+    ek_ec2_instance_mandatory: >
+      {
+        'key_name': "ek_{{ekara_env_id}}",
+        'region': "{{ekara_aws_region}}",
+        'wait': true,
+        'exact_count': "{{ek_config.instances}}",
+        'count_tag': {
+          'ek_nodeset_id': "{{ekara_nodeset_id}}"
+        },
+        'instance_tags': {
+          'ek_env_id': "{{ekara_env_id}}",
+          'ek_nodeset_id': "{{ekara_nodeset_id}}",
+          'ek_nodeset_name': "{{ek_config.environment.nodeset}}"
+        }
+      }
 
-- name: Provision EC2 instance(s)
-  include_tasks: "{{ekara_temp_dir}}/instances-{{ek_config.environment.id}}.yml"
+- name: Combine instance user settings with default and mandatory settings
+  set_fact:
+    ek_ec2_instance_settings: "{{ ek_ec2_instance_defaults | combine(ek_config.params.instances | default({}), recursive=True) | combine(ek_ec2_instance_mandatory, recursive=True) }}"
+
+- name: Inject placement group into instance settings
+  when: ek_ec2_pg_info is defined
+  set_fact:
+    ek_ec2_instance_settings: "{{ ek_ec2_instance_settings | combine({'placement_group': ek_ec2_pg_info.placement_group.name}, recursive=True) }}"
+
+- name: Inject security group(s) into instance settings
+  when: ek_ec2_sg_info is defined
+  set_fact:
+    ek_ec2_instance_settings: "{{ ek_ec2_instance_settings | combine({'group_id': ek_ec2_sg_info | json_query('*.group_id')}, recursive=True) }}"
+
+- name: Inject user labels into instance settings
+  when: ek_config.labels | length > 0
+  loop: "{{ ek_config.labels | dict2items }}"
+  loop_control:
+    label: "{{ item.key ~ '=' ~ item.value }}"
+  set_fact:
+    ek_ec2_instance_settings: "{{ ek_ec2_instance_settings | combine({'instance_tags': { item.key | regex_replace('^', 'ek_label_'): item.value } }, recursive=True) }}"
+
+- debug:
+    var: ek_ec2_instance_settings
+
+- name: "Ensure {{ ek_ec2_instance_settings.exact_count }} EC2 instance(s) are present"
+  ec2: "{{ ek_ec2_instance_settings }}"
+  register: ek_ec2_instance_info
+
+- debug:
+    var: ek_ec2_instance_info
