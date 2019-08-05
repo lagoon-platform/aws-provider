@@ -1,5 +1,5 @@
 ---
-- name: Gather new EC2 instance(s) without role
+- name: Gather EC2 instance(s) without role
   set_fact:
     ekara_new_instances: "{{ (ekara_new_instances|default([])) + [item] }}"
   loop: "{{ ek_ec2_instance_info.tagged_instances }}"
@@ -9,7 +9,7 @@
   when:
   - ek_ec2_instance_info.tagged_instances[index].tags['ek_role'] is not defined
 
-- name: Automatically assign roles to new EC2 instance(s)
+- name: Automatically assign roles to EC2 instance(s) without role
   when:
   - ekara_new_instances is defined
   block:
@@ -32,6 +32,7 @@
   - name: Gather environment existing managers
     ec2_instance_facts:
       filters:
+        "tag:ek_env_id": "{{ ekara_env_id }}"
         "tag:ek_role": "manager"
         instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
     register: ekara_manager_instances
