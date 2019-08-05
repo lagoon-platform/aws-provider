@@ -1,14 +1,9 @@
 ---
-- name: Create security group(s)
-  ec2_group:
-    name: "{{ek_config.environment.id}}_{{ item.name }}"
-    description: "sg {{item.name}} for {{ek_config.environment.id}}"
-    vpc_id: "{{ ek_config.params.vpc_id }}"
-    rules: "{{item.rules}}"
-  loop: "{{ek_config.params.security_groups}}"
+- name: "Iterating over security group(s)"
+  loop: "{{ ek_config.params.securityGroups | dict2items }}"
+  loop_control:
+    loop_var: sg_item
+  include: security-group.yml
 
-- set_fact:
-    ek_ec2_group: |
-      {% for g in ek_config.params.security_groups %}
-      {{ek_config.environment.id}}_{{ g.name }}
-      {% if not loop.last %},{% endif %}{%endfor%}
+- debug:
+    var: ek_ec2_sg_info

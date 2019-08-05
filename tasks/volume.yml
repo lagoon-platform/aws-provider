@@ -1,0 +1,40 @@
+---
+- name: Define defaults and mandatory settings for EC2 volume
+  set_fact:
+    ek_ec2_vol_defaults: >
+      {{
+        {
+          'volume_type': 'gp2'
+        }
+      }}
+    ek_ec2_vol_mandatory: >
+      {{
+        {
+          'state': 'present'
+        }
+      }}
+
+- name: Combine volume user settings with default and mandatory settings
+  set_fact:
+    ek_ec2_vol_settings: "{{ ek_ec2_vol_defaults | combine(vol_item.1.value.ebs | default({}), recursive=True) | combine(ek_ec2_vol_mandatory, recursive=True) }}"
+
+- name: Inject user labels into volume settings
+  when: ek_config.labels | length > 0
+  loop: "{{ ek_config.labels | dict2items }}"
+  set_fact:
+    ek_ec2_vol_settings: "{{ ek_ec2_vol_settings | combine({'tags': { item.key | regex_replace('^', 'ek_label_'): item.value} }, recursive=True) }}"
+
+- name: Inject instance identifier into volume settings
+  set_fact:
+    ek_ec2_vol_settings: "{{ ek_ec2_vol_settings | combine({'instance': vol_item.0.id, 'name': vol_item.0.id ~ '_' ~ vol_item.1.key}, recursive=True) }}"
+
+- debug:
+    var: ek_ec2_vol_settings
+
+- name: "Ensure volume {{ vol_item.1.key }} exists and is attached to instance {{ vol_item.0.id }}"
+  ec2_vol: "{{ ek_ec2_vol_settings }}"
+  register: ek_ec2_vol_info
+
+- name: Store information about the volume
+  set_fact:
+    ek_ec2_vol_info: "{{ ek_ec2_vol_info | default({}) | combine({vol_item.0.id: {vol_item.1.key: ek_ec2_vol_info} }, recursive=True) }}"

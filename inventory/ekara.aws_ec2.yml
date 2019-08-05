@@ -28,9 +28,15 @@ keyed_groups:
 compose:
   ekara: >
     {
+      'id': instance_id,
       'public_ip': public_ip_address,
       'private_ip': private_ip_address,
       'role': tags.ek_role,
       'nodeset': tags.ek_nodeset_name,
-      'environment': tags.ek_env_id
+      'environment': tags.ek_env_id,
+      'provider': 'aws',
+      'block_devices': {
+        'root': root_device_name,
+        'others': block_device_mappings | json_query('[*].device_name') | difference([root_device_name])
+      }
     }

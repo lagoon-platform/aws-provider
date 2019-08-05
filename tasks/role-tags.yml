@@ -1,24 +1,13 @@
 ---
-- name: Add labels on EC2 instance(s)
-  ec2_tag:
-    resource: "{{item.id}}"
-    region: "{{item.region}}"
-    state: present
-    tags: "{{ek_config.params.instance_tags}}"
-  loop: "{{ec2.tagged_instances}}"
-  loop_control:
-    label: "{{item.id}}"
-  when: ek_config.params.instance_tags is defined
-
 - name: Gather new EC2 instance(s) without role
   set_fact:
     ekara_new_instances: "{{ (ekara_new_instances|default([])) + [item] }}"
-  loop: "{{ ec2.tagged_instances }}"
+  loop: "{{ ek_ec2_instance_info.tagged_instances }}"
   loop_control:
     index_var: index
     label: "{{item.id}}"
   when:
-  - ec2.tagged_instances[index].tags['ek_role'] is not defined
+  - ek_ec2_instance_info.tagged_instances[index].tags['ek_role'] is not defined
 
 - name: Automatically assign roles to new EC2 instance(s)
   when:
