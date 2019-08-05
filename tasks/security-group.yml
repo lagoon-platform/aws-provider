@@ -2,14 +2,14 @@
 - name: Define defaults and mandatory settings for the EC2 security group
   set_fact:
     ek_ec2_current_sg_defaults: >
-      {{ 
+      {{
         {
           'name': "{{ ekara_nodeset_id }}_{{ sg_item.key }}",
           'description': "Security group {{ sg_item.key }} for {{ ekara_nodeset_id }}"
         }
       }}
     ek_ec2_current_sg_mandatory: >
-      {{ 
+      {{
         {
           'region': "{{ ekara_aws_region }}",
           'state': 'present'

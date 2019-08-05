@@ -2,13 +2,13 @@
 - name: Define defaults and mandatory settings for EC2 volume
   set_fact:
     ek_ec2_vol_defaults: >
-      {{ 
+      {{
         {
           'volume_type': 'gp2'
         }
       }}
     ek_ec2_vol_mandatory: >
-      {{ 
+      {{
         {
           'state': 'present'
         }

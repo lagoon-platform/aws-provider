@@ -2,18 +2,18 @@
 - name: Define default and mandatory settings for filesystem
   set_fact:
     ek_fs_defaults: >
-      {{ 
+      {{
         {
           'type': 'ext4',
           'mount_opts': 'defaults'
         }
       }}
     ek_fs_mandatory: >
-      {{ 
+      {{
         {
         }
       }}
-      
+
 - name: Combine filesystem user settings with default and mandatory settings
   set_fact:
     ek_fs_settings: "{{ ek_fs_defaults | combine(hostvars['localhost'].ek_config.params.volumes[fs_item.key].fs | default({}), recursive=True) | combine(ek_fs_mandatory, recursive=True) }}"

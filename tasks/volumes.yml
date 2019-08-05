@@ -1,6 +1,6 @@
 ---
 - name: "Iterating over instance(s) and volume(s)"
-  loop: "{{ ek_ec2_instance_info.tagged_instances | product(ek_config.params.volumes | dict2items) | list }}" 
+  loop: "{{ ek_ec2_instance_info.tagged_instances | product(ek_config.params.volumes | dict2items) | list }}"
   loop_control:
     loop_var: vol_item
   include: volume.yml
