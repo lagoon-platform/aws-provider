@@ -3,7 +3,6 @@
   set_fact:
     ek_ec2_instance_defaults: >
       {
-        'image': "ami-f90a4880",
         'instance_tags': {
             'Name': "{{ek_config.environment.name}} ({{ek_config.environment.qualifier}}) - {{ek_config.environment.nodeset}}"
         }
