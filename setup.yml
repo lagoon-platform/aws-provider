@@ -35,6 +35,7 @@
       ek_ssh_proxy: "{{ lookup('env', 'http_proxy') }}"
       ek_ssh_key: "{{ ek_config.ssh.private_key }}"
       ek_ssh_host: '*.amazonaws.com'
+      ek_ssh_user: 'ubuntu'
 
   - name: Install AWS modules with PIP
     become: true
