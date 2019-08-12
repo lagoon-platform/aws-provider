@@ -17,7 +17,7 @@
     - name: Create a new key pair
       ec2_key:
         name: "ek_{{ ek_config.environment.id }}"
-        key_material: "{{ lookup('file', ek_config.connectionConfig.machine_public_key) }}"
+        key_material: "{{ lookup('file', ek_config.ssh.public_key) }}"
 
     - name: Provision placement group
       include_tasks: tasks/placement-group.yml
