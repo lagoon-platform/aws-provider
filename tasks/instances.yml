@@ -9,16 +9,16 @@
       }
     ek_ec2_instance_mandatory: >
       {
-        'key_name': "ek_{{ekara_env_id}}",
-        'region': "{{ekara_aws_region}}",
+        'key_name': "ek_{{ ek_config.environment.id }}",
+        'region': "{{ ek_aws_region }}",
         'wait': true,
         'exact_count': "{{ek_config.instances}}",
         'count_tag': {
-          'ek_nodeset_id': "{{ekara_nodeset_id}}"
+          'ek_nodeset_id': "{{ ek_config.environment.id }}_{{ ek_config.environment.nodeset }}"
         },
         'instance_tags': {
-          'ek_env_id': "{{ekara_env_id}}",
-          'ek_nodeset_id': "{{ekara_nodeset_id}}",
+          'ek_env_id': "{{ ek_config.environment.id }}",
+          'ek_nodeset_id': "{{ ek_config.environment.id }}_{{ ek_config.environment.nodeset }}",
           'ek_nodeset_name': "{{ek_config.environment.nodeset}}"
         }
       }

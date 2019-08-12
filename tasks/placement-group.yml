@@ -4,13 +4,13 @@
     ek_ec2_pg_defaults: >
       {{
         {
-          'name': "{{ ekara_nodeset_id }}_pg"
+          'name': "{{ ek_config.environment.id }}_{{ ek_config.environment.nodeset }}_pg"
         }
       }}
     ek_ec2_pg_mandatory: >
       {{
         {
-          'region': "{{ ekara_aws_region }}",
+          'region': "{{ ek_aws_region }}",
           'state': 'present'
         }
       }}

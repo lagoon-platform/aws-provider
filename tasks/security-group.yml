@@ -4,14 +4,14 @@
     ek_ec2_current_sg_defaults: >
       {{
         {
-          'name': "{{ ekara_nodeset_id }}_{{ sg_item.key }}",
-          'description': "Security group {{ sg_item.key }} for {{ ekara_nodeset_id }}"
+          'name': "{{ ek_config.environment.id }}_{{ ek_config.environment.nodeset }}_{{ sg_item.key }}",
+          'description': "Security group {{ sg_item.key }} for {{ ek_config.environment.id }}_{{ ek_config.environment.nodeset }}"
         }
       }}
     ek_ec2_current_sg_mandatory: >
       {{
         {
-          'region': "{{ ekara_aws_region }}",
+          'region': "{{ ek_aws_region }}",
           'state': 'present'
         }
       }}

@@ -2,19 +2,15 @@
 - hosts: localhost
   connection: local
   gather_facts: false
-  tasks:
+  pre_tasks:
   - name: Checkout roles
     command: ansible-galaxy install -r requirements.yml
 
-- hosts: localhost
-  connection: local
-  gather_facts: false
-  pre_tasks:
+  tasks:
   - name: Load configuration
     include_role:
       name: ekara.configuration
 
-  tasks:
   - name: Create the AWS config directory
     file:
       path: /root/.aws
@@ -26,27 +22,25 @@
       dest: /root/.aws/config
       mode: 0600
 
-  # TODO: remove AWS credentials files in favor of propagated environment variables
-  # (must also be available in later phases for inventory)
   - name: Copy AWS CLI credentials
     template:
       src: templates/aws/credentials
       dest: /root/.aws/credentials
       mode: 0600
 
-  - name: Add initial SSH configuration
+  - name: Ensure SSH is configured on the Ansible controller
     include_role:
       name: ekara.ssh
     vars:
-      ekara_ssh_proxy: "{{ lookup('env', 'http_proxy') }}"
-      ekara_ssh_key: "{{ ek_config.connectionConfig.machine_private_key }}"
-      ekara_ssh_host: '*.amazonaws.com'
+      ek_ssh_proxy: "{{ lookup('env', 'http_proxy') }}"
+      ek_ssh_key: "{{ ek_config.ssh.private_key }}"
+      ek_ssh_host: '*.amazonaws.com'
 
   - name: Install AWS modules with PIP
     become: true
     pip:
+      state: present
       name:
       - awscli==1.16.193
       - boto3==1.9.183
       - boto==2.49.0
-      state: present

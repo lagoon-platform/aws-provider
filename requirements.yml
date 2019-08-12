@@ -10,3 +10,7 @@
 - src: https://github.com/ekara-platform/ansible-role-filesystem.git
   version: master
   name: ekara.filesystem
+
+- src: https://github.com/ekara-platform/ansible-role-install.git
+  version: master
+  name: ekara.install
