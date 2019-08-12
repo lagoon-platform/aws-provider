@@ -35,6 +35,7 @@ compose:
       'nodeset': tags.ek_nodeset_name,
       'environment': tags.ek_env_id,
       'provider': 'aws',
+      'labels': tags | dict2items | json_query('[?starts_with(key, `ek_label_`)]') | items2dict,
       'block_devices': {
         'root': root_device_name,
         'others': block_device_mappings | json_query('[*].device_name') | difference([root_device_name])
