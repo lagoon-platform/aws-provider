@@ -43,7 +43,7 @@
     meta: refresh_inventory
 
 - hosts: ek_nodeset_{{ hostvars['localhost'].ek_config.environment.nodeset }}
-  gather_facts: false
+  gather_facts: true
 
   tasks:
   - name: Make filesystem(s) and mount volume(s)
