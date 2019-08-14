@@ -1,0 +1,9 @@
+---
+- name: Ensure SSH is configured on the Ansible controller to access nodes
+  include_role:
+    name: ekara.ssh
+  vars:
+    ek_ssh_proxy: "{{ lookup('env', 'http_proxy') }}"
+    ek_ssh_key: "{{ ek_config.ssh.private_key }}"
+    ek_ssh_host: '*.amazonaws.com'
+    ek_ssh_user: 'ubuntu' # TODO: make this configurable and/or inspect the AMI to determine OS
