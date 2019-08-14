@@ -27,7 +27,7 @@
   - name: Install AWS modules with PIP
     become: true
     pip:
-      state: present
+      state: forcereinstall
       name:
       - awscli==1.16.193
       - boto3==1.9.183
