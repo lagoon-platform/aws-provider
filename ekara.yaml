@@ -6,7 +6,7 @@ providers:
     params:
       instances:
         # Ubuntu minimal 18.04 LTS (2019-07-23)
-        image: ami-f90a4880
+        image: ami-0340dafef51c18ba1
     env:
       AWS_REGION: {{ .Vars.ek.aws.region }}
       AWS_ACCESS_KEY_ID: {{ .Vars.ek.aws.accessKey.id }}
