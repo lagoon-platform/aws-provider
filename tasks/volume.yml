@@ -33,8 +33,8 @@
 
 - name: "Ensure volume {{ vol_item.1.key }} exists and is attached to instance {{ vol_item.0.id }}"
   ec2_vol: "{{ ek_ec2_vol_settings }}"
-  register: ek_ec2_vol_info
+  register: ek_ec2_curr_vol_info
 
 - name: Store information about the volume
   set_fact:
-    ek_ec2_vol_info: "{{ ek_ec2_vol_info | default({}) | combine({vol_item.0.id: {vol_item.1.key: ek_ec2_vol_info} }, recursive=True) }}"
+    ek_ec2_vol_info: "{{ ek_ec2_vol_info | default({}) | combine({vol_item.0.id: {vol_item.1.key: ek_ec2_curr_vol_info} }, recursive=True) }}"
