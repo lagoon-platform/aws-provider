@@ -3,7 +3,7 @@
   gather_facts: false
   pre_tasks:
   - name: Checkout roles
-    command: ansible-galaxy install -r requirements.yml
+    command: ansible-galaxy install -r requirements.yaml
 
   tasks:
   - name: Ensure the AWS config directory exists
