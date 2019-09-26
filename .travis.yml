@@ -10,4 +10,4 @@ before_install:
 install: true
 
 script:
-- find . -name '*.yml'| xargs -n1 yamllint
+- find . -name '*.yaml' -or -name '*.yml'| xargs -n1 yamllint
