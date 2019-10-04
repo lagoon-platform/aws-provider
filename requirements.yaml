@@ -1,12 +1,12 @@
 ---
 - src: https://github.com/ekara-platform/ansible-role-configuration.git
-  version: master
+  version: v1.0.0
   name: ekara.configuration
 
 - src: https://github.com/ekara-platform/ansible-role-ssh-config.git
-  version: master
+  version: v1.0.0
   name: ekara.ssh
 
 - src: https://github.com/ekara-platform/ansible-role-filesystem.git
-  version: master
+  version: v1.0.0
   name: ekara.filesystem
