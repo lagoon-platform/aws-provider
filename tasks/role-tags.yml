@@ -24,7 +24,8 @@
         instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
     register: ekara_instances
 
-  - set_fact:
+  - name: Count all EC2 instances(s)
+    set_fact:
       ekara_instances_count: "{{ekara_instances.instances|length|int}}"
 
   - debug:
@@ -39,27 +40,29 @@
         instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
     register: ekara_manager_instances
 
-  - set_fact:
+  - name: Count existing managers
+    set_fact:
       ekara_existing_manager_count: "{{ekara_manager_instances.instances|length|int}}"
 
   - debug:
       verbosity: 1
       msg: "{{ekara_existing_manager_count|int}} existing manager(s) found"
 
-  - name: Estimate total manager count
+  - name: Compute total manager count
     set_fact:
       ekara_total_manager_count: >
         {% set ns = namespace(managers=1) %}{% for x in range(1,([5,(ekara_instances_count|int)]|min)+1) %}
         {%if x % 2 == 1%}{% set ns.managers = x %}{%endif%}{%endfor%}{{ns.managers}}
 
-  - set_fact:
+  - name: Compute missing manager count
+    set_fact:
       ekara_missing_manager_count: "{{ (ekara_total_manager_count|int) - (ekara_existing_manager_count|int) }}"
 
   - debug:
       verbosity: 1
       msg: "{{ ekara_missing_manager_count|int }} EC2 instance(s) must be assigned the manager role"
 
-  - name: Assigning role to EC2 instances(s)
+  - name: Assign role to EC2 instances(s)
     ec2_tag:
       resource: "{{item.id}}"
       region: "{{item.region}}"
