@@ -23,6 +23,7 @@
     ek_fs_settings: "{{ ek_fs_settings | combine({'device': fs_item.value.device}, recursive=True) }}"
 
 - debug:
+    verbosity: 1
     var: ek_fs_settings
 
 - name: Format and mount volume

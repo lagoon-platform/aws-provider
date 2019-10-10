@@ -14,6 +14,7 @@
   - ekara_new_instances is defined
   block:
   - debug:
+      verbosity: 1
       msg: "{{ekara_new_instances|length|int}} new instance(s) found"
 
   - name: Gather all EC2 instance(s)
@@ -27,6 +28,7 @@
       ekara_instances_count: "{{ekara_instances.instances|length|int}}"
 
   - debug:
+      verbosity: 1
       msg: "{{ekara_instances_count|int}} total instance(s) found"
 
   - name: Gather environment existing managers
@@ -41,6 +43,7 @@
       ekara_existing_manager_count: "{{ekara_manager_instances.instances|length|int}}"
 
   - debug:
+      verbosity: 1
       msg: "{{ekara_existing_manager_count|int}} existing manager(s) found"
 
   - name: Estimate total manager count
@@ -53,6 +56,7 @@
       ekara_missing_manager_count: "{{ (ekara_total_manager_count|int) - (ekara_existing_manager_count|int) }}"
 
   - debug:
+      verbosity: 1
       msg: "{{ ekara_missing_manager_count|int }} EC2 instance(s) must be assigned the manager role"
 
   - name: Assigning role to EC2 instances(s)

@@ -18,9 +18,11 @@
   set_fact:
     ek_ec2_pg_settings: "{{ ek_ec2_pg_defaults | combine(ek_config.params.placementGroup | default({}), recursive=True) | combine(ek_ec2_pg_mandatory, recursive=True) }}"
 - debug:
+    verbosity: 1
     var: ek_ec2_pg_settings
 - name: Ensure the placement group is present
   ec2_placement_group: "{{ ek_ec2_pg_settings }}"
   register: ek_ec2_pg_info
 - debug:
+    verbosity: 1
     var: ek_ec2_pg_info

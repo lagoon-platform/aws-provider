@@ -29,6 +29,7 @@
     ek_ec2_vol_settings: "{{ ek_ec2_vol_settings | combine({'instance': vol_item.0.id, 'name': vol_item.0.id ~ '_' ~ vol_item.1.key}, recursive=True) }}"
 
 - debug:
+    verbosity: 1
     var: ek_ec2_vol_settings
 
 - name: "Ensure volume {{ vol_item.1.key }} exists and is attached to instance {{ vol_item.0.id }}"

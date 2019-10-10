@@ -6,4 +6,5 @@
   include: volume.yml
 
 - debug:
+    verbosity: 1
     var: ek_ec2_vol_info

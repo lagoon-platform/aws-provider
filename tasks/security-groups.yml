@@ -6,4 +6,5 @@
   include: security-group.yml
 
 - debug:
+    verbosity: 1
     var: ek_ec2_sg_info
