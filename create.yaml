@@ -39,9 +39,6 @@
       include_tasks: tasks/role-tags.yml
       when: ek_config.role is not defined
 
-  - name: Ensure SSH is configured on the Ansible controller to access AWS nodes
-    include_tasks: tasks/ssh.yml
-
   - name: Refresh inventory to gather new EC2 instance(s) if any
     meta: refresh_inventory
 
