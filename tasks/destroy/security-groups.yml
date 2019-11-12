@@ -1,0 +1,12 @@
+---
+- name: Gather all EC2 security group(s)
+  ec2_group_facts:
+    filters:
+      "tag:ek_env_id": "{{ ek_config.environment.id }}"
+  register: ekara_security_groups
+
+- name: "Ensure EC2 security group is absent"
+  loop: "{{ ekara_security_groups }}"
+  ec2_group:
+    group_id: "{{ item.group_id }}"
+    state: absent

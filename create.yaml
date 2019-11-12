@@ -21,22 +21,22 @@
         force: false
 
     - name: Provision placement group
-      include_tasks: tasks/placement-group.yml
+      include_tasks: tasks/create/placement-group.yml
       when: ek_config.params.placementGroup is defined
 
     - name: Provision security group(s)
-      include_tasks: tasks/security-groups.yml
+      include_tasks: tasks/create/security-groups.yml
       when: (ek_config.params.securityGroups is defined) and (ek_config.params.securityGroups | length > 0)
 
     - name: Provision instance(s)
-      include_tasks: tasks/instances.yml
+      include_tasks: tasks/create/instances.yml
 
     - name: Provision volume(s)
-      include_tasks: tasks/volumes.yml
+      include_tasks: tasks/create/volumes.yml
       when: ek_config.params.volumes is defined
 
     - name: Determine role of instance(s)
-      include_tasks: tasks/role-tags.yml
+      include_tasks: tasks/create/role-tags.yml
       when: ek_config.role is not defined
 
   - name: Refresh inventory to gather new EC2 instance(s) if any
@@ -47,5 +47,5 @@
 
   tasks:
   - name: Make filesystem(s) and mount volume(s)
-    include_tasks: tasks/filesystems.yml
+    include_tasks: tasks/create/filesystems.yml
     when: hostvars['localhost'].ek_ec2_vol_info is defined
