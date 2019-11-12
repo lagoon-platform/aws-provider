@@ -3,7 +3,6 @@
   ec2_instance_facts:
     filters:
       "tag:ek_nodeset_id": "{{ ek_config.environment.id }}_{{ ek_config.environment.nodeset }}"
-      instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
   register: ekara_instances
 
 - name: "Ensure EC2 instance(s) are absent"
