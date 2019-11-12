@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  gather_facts: false
+
+  pre_tasks:
+  - name: Load configuration
+    include_role:
+      name: ekara.configuration
+
+  tasks:
+  - name: Set AWS region
+    set_fact:
+      ek_aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+
+  - name: Destroy AWS EC2 infrastructure
+    block:
+    - name: Delete instance(s)
+      include_tasks: tasks/destroy/instances.yml
+
+    - name: Delete security group(s)
+      include_tasks: tasks/destroy/security-groups.yml
+
+    - name: Delete the key pair
+      ec2_key:
+        name: "ek_{{ ek_config.environment.id }}"
+        state: absent
