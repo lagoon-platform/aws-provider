@@ -7,12 +7,14 @@
   register: ekara_instances
 
 - name: "Ensure EC2 instance(s) are absent"
+  when: ekara_instances.instances | length > 0
   ec2:
     instance_ids: "{{ ekara_instances | json_query('instances[].instance_id') }}"
     state: absent
     wait: true
 
 - name: "Ensure placement group(s) are absent"
+  when: ekara_instances.instances | length > 0
   loop: "{{ ekara_instances | json_query('instances[].placement.group_name') }}"
   ec2_placement_group:
     name: "{{ item }}"
