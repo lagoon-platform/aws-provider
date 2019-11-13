@@ -36,8 +36,9 @@ compose:
       'environment': tags.ek_env_id,
       'provider': 'aws',
       'labels': tags | dict2items | json_query('[?starts_with(key, `ek_label_`)]') | items2dict | replace('ek_label_', '') | from_yaml,
-      'block_devices': {
-        'root': root_device_name,
-        'others': block_device_mappings | json_query('[*].device_name') | difference([root_device_name])
+      'proxy': {
+        'http': {{ .Component.Proxy.Http }},
+        'https': {{ .Component.Proxy.Https }},
+        'exclusions': {{ .Component.Proxy.NoProxy }}
       }
     }
