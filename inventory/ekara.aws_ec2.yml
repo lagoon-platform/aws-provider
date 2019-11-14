@@ -37,8 +37,8 @@ compose:
       'provider': 'aws',
       'labels': tags | dict2items | json_query('[?starts_with(key, `ek_label_`)]') | items2dict | replace('ek_label_', '') | from_yaml,
       'proxy': {
-        'http_proxy': {{ .Component.Proxy.Http }},
-        'https_proxy': {{ .Component.Proxy.Https }},
-        'no_proxy': {{ .Component.Proxy.NoProxy }}
+        'http_proxy': '{{ .Component.Proxy.Http }}',
+        'https_proxy': '{{ .Component.Proxy.Https }}',
+        'no_proxy': '{{ .Component.Proxy.NoProxy }}'
       }
     }
