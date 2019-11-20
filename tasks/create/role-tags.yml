@@ -50,16 +50,7 @@
 
   - name: Determine total manager count
     set_fact:
-      ekara_total_manager_count: >
-        {% if ekara_instances_count < 3 %}
-        1
-        {% elif ekara_instances_count < 7 %}
-        3
-        {% elif ekara_instances_count < 9 %}
-        5
-        {% else %}
-        7
-        {% endif %}
+      ekara_total_manager_count: "{% if (ekara_instances_count|int) < 3 %}1{% elif (ekara_instances_count|int) < 7 %}3{% elif (ekara_instances_count|int) < 9 %}5{% else %}7{% endif %}"
 
   - name: Determine missing manager count
     set_fact:
