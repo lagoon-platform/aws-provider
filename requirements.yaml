@@ -10,3 +10,7 @@
 - src: https://github.com/ekara-platform/ansible-role-filesystem.git
   version: v1.0.0
   name: ekara.filesystem
+
+- src: https://github.com/ekara-platform/ansible-ebs-automatic-nvme-mapping.git
+  version: master
+  name: ekara.nvme

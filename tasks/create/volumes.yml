@@ -1,4 +1,9 @@
 ---
+- name: "Enabling support for consistent nvme device mapping"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  include_role:
+    name: ekara.nvme
+
 - name: "Iterating over instance(s) and volume(s)"
   loop: "{{ ek_ec2_instance_info.tagged_instances | product(ek_config.params.volumes | dict2items) | list }}"
   loop_control:
