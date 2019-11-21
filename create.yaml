@@ -46,6 +46,11 @@
   gather_facts: true
 
   tasks:
+  - name: Enabling support for consistent nvme device mapping
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    include_role:
+      name: ekara.nvme
+
   - name: Make filesystem(s) and mount volume(s)
     include_tasks: tasks/create/filesystems.yml
     when: hostvars['localhost'].ek_ec2_vol_info is defined
