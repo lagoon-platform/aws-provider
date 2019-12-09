@@ -35,12 +35,3 @@
       src: templates/aws/credentials
       dest: /root/.aws/credentials
       mode: 0600
-
-  - name: Install AWS modules with PIP
-    become: true
-    pip:
-      state: present
-      name:
-      - awscli==1.16.193
-      - boto3==1.9.183
-      - boto==2.49.0
