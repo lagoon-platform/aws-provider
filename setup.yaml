@@ -30,12 +30,6 @@
       dest: /root/.aws/config
       mode: 0600
 
-  - name: Copy AWS CLI credentials
-    template:
-      src: templates/aws/credentials
-      dest: /root/.aws/credentials
-      mode: 0600
-
   - name: Install AWS modules with PIP
     become: true
     pip:
