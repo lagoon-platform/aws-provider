@@ -5,7 +5,8 @@
       {{
         {
           'type': 'ext4',
-          'mount_opts': 'defaults'
+          'mount_opts': 'defaults',
+          'owner': 'ubuntu'
         }
       }}
     ek_fs_mandatory: >
@@ -34,3 +35,4 @@
     ek_fs_type: "{{ ek_fs_settings.type }}"
     ek_fs_mount_path: "{{ ek_fs_settings.mount_path }}"
     ek_fs_mount_opts: "{{ ek_fs_settings.mount_opts }}"
+    ek_fs_owner: "{{ ek_fs_settings.owner }}"
