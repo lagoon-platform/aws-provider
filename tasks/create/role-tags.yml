@@ -18,7 +18,7 @@
       msg: "{{ekara_new_instances|length|int}} new instance(s) found"
 
   - name: Gather all EC2 instance(s)
-    ec2_instance_facts:
+    ec2_instance_info:
       filters:
         "tag:ek_env_id": "{{ ek_config.environment.id }}"
         instance-state-name: ['running', 'pending', 'shutting-down', 'stopped', 'stopping']
@@ -33,7 +33,7 @@
       msg: "{{ekara_instances_count|int}} total instance(s) found"
 
   - name: Gather environment existing managers
-    ec2_instance_facts:
+    ec2_instance_info:
       filters:
         "tag:ek_env_id": "{{ ek_config.environment.id }}"
         "tag:ek_role": "manager"

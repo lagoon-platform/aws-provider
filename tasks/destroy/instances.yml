@@ -1,6 +1,6 @@
 ---
 - name: Gather all EC2 instance(s)
-  ec2_instance_facts:
+  ec2_instance_info:
     filters:
       "tag:ek_nodeset_id": "{{ ek_config.environment.id }}_{{ ek_config.environment.nodeset }}"
   register: ekara_instances
