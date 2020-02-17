@@ -43,4 +43,5 @@
       name:
       - awscli==1.16.193
       - boto3==1.9.183
-      - boto==2.49.0
+      - git+https://github.com/ekara-platform/boto.git@proxy-bytes-fix
+      #- boto==2.49.0
