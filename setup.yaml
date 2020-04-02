@@ -43,4 +43,4 @@
       name:
       - awscli==1.16.193
       - boto3==1.9.183
-      - git+https://github.com/ekara-platform/boto.git@2.49.1
+      - git+https://github.com/ekara-platform/boto.git@2.49.2
