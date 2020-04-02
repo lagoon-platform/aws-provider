@@ -2,7 +2,7 @@
 plugin: aws_ec2
 
 regions:
-- {{ .Vars.ek.aws.region }}
+- {{ .Vars.ekara.aws.region }}
 
 hostnames:
 - dns-name
