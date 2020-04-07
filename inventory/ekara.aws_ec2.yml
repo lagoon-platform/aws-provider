@@ -21,6 +21,7 @@ keyed_groups:
 - key: tags.ek_role
   separator: _
   prefix: ek_role
+  parent_group: nodes
 - key: tags | dict2items | json_query('[?starts_with(key, `ek_label_`)][key, value]') | map('join', '_') | list | replace('ek_label_', '')
   separator: ""
   prefix: ""
