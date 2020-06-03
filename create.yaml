@@ -18,7 +18,7 @@
       ec2_key:
         name: "ek_{{ ek_config.environment.id }}"
         key_material: "{{ lookup('file', ek_config.ssh.public_key) }}"
-        force: false
+        force: true
 
     - name: Provision placement group
       include_tasks: tasks/create/placement-group.yml
