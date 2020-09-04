@@ -12,7 +12,7 @@ hostnames:
 
 filters:
   instance-state-code: '16'
-  tag:ek_env_id: {{ .Model.QualifiedName }}
+  tag:ek_env_id: {{ .Model.QName }}
 
 keyed_groups:
 - key: tags.ek_nodeset_name
