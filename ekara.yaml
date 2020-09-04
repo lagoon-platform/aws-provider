@@ -1,6 +1,7 @@
 ---
-templates:
-- inventory/ekara.aws_ec2.yml
+ekara:
+  templates:
+  - inventory/ekara.aws_ec2.yml
 
 providers:
   ek-aws:
